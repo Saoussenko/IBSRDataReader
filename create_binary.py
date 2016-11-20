@@ -7,8 +7,6 @@ from utils import perform_rotation
 from read_data import get_file
 
 
-my_order_file_address = '/home/siavash/programming/thesis/meta/my_order.txt'
-label_directory = '/home/siavash/programming/thesis/labels/'
 nifti_file_base = '/home/siavash/programming/thesis/nifti_files/'
 np_file_addresses = '/home/siavash/programming/thesis/npy_files/'
 pre_processed_nifti_folder = '/home/siavash/programming/thesis/preprocessed_nifti_files/'
@@ -20,7 +18,7 @@ def create_npy():
 
     headers = [x for x in os.listdir(settings.LABELS_ADDRESS) if x.endswith(settings.HEADER_FILES_SUFFIX)]
     for file_name in headers:
-        header_file_address = label_directory + file_name
+        header_file_address = settings.LABELS_ADDRESS + file_name
         with open(header_file_address) as header_file:
             number_of_cuts = int(header_file.readline().split()[2])
             print header_file_address
