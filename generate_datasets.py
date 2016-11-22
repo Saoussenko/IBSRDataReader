@@ -18,7 +18,7 @@ required_number_of_points_for_each_class = {
 }
 
 # The dimension are something like as: 256, 50, 256
-cuboid_dimensions = 25, 25, 25
+cuboid_dimensions = 50, 5, 50
 x_step = cuboid_dimensions[0] / 2
 y_step = cuboid_dimensions[1] / 2
 z_step = cuboid_dimensions[2] / 2
@@ -39,6 +39,7 @@ def generate_datasets():
     labels = []
     for file_address in os.listdir(data_folder + 'images/'):
         image = np.load(data_folder + 'images/' + file_address)
+        image = image / np.max(image)
         label = np.load(data_folder + 'labels/' + file_address[:-4] + '_lbl.npy')
         for l, ml in label_mapping.iteritems():
             label[np.where(label == l)] = ml
