@@ -11,14 +11,14 @@ label_mapping = {
     254: 3,
 }
 required_number_of_points_for_each_class = {
-    0: 20,
-    1: 20,
-    2: 20,
-    3: 20,
+    0: 80,
+    1: 80,
+    2: 80,
+    3: 80,
 }
 
 # The dimension are something like as: 256, 50, 256
-cuboid_dimensions = 50, 5, 50
+cuboid_dimensions = 11, 1, 11
 x_step = cuboid_dimensions[0] / 2
 y_step = cuboid_dimensions[1] / 2
 z_step = cuboid_dimensions[2] / 2
@@ -34,13 +34,16 @@ def extract_point(image, point):
     ]
 
 
-def generate_datasets():
+def generate_datasets(prefix):
     images = []
     labels = []
-    for file_address in os.listdir(data_folder + 'images/'):
-        image = np.load(data_folder + 'images/' + file_address)
-        image = image / np.max(image)
-        label = np.load(data_folder + 'labels/' + file_address[:-4] + '_lbl.npy')
+    for file_address in os.listdir(data_folder + prefix + 'images/'):
+        image = np.load(data_folder + prefix + 'images/' + file_address)
+        # image = image / np.max(image)
+        for i in xrange(image.shape[1]):
+            if np.max(image[:, i, :]) != 0:
+                image[:, i, :] = image[:, i, :] / np.max(image[:, i, :])
+        label = np.load(data_folder + prefix + 'labels/' + file_address[:-4] + '_lbl.npy')
         for l, ml in label_mapping.iteritems():
             label[np.where(label == l)] = ml
 
@@ -69,9 +72,34 @@ def generate_datasets():
 
     images = np.concatenate(images)
     labels = np.array(labels)
-    return images, labels
+
+    shuffled_indices = range(len(images))
+    np.random.shuffle(shuffled_indices)
+    images = images[shuffled_indices]
+    labels = labels[shuffled_indices]
+
+    return images, labels, shuffled_indices
+
+required_number_of_points_for_each_class = {
+    0: 80,
+    1: 80,
+    2: 80,
+    3: 80,
+}
+
+tr_x, tr_y, tr_shuffled_indices = generate_datasets('tr_')
+np.save('tr_images.npy', tr_x)
+np.save('tr_labels', tr_y)
+np.save('tr_shuffled_indices', tr_shuffled_indices)
 
 
-tr_x, tr_y = generate_datasets()
-np.save('images.npy', tr_x)
-np.save('labels', tr_y)
+required_number_of_points_for_each_class = {
+    0: 80,
+    1: 80,
+    2: 80,
+    3: 80,
+}
+te_x, te_y, te_shuffled_indices = generate_datasets('te_')
+np.save('te_images.npy', te_x)
+np.save('te_labels', te_y)
+np.save('te_shuffled_indices', te_shuffled_indices)
